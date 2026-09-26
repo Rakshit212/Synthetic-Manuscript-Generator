@@ -10,6 +10,8 @@ from src.rendering.renderer import render_text
 from src.rendering.handwriting import apply_handwriting_variation
 from src.effects.ink import apply_ink_effects
 from src.effects.deformation import apply_deformation
+from src.effects.stains import apply_stains
+from src.effects.noise import apply_noise
 from src.annotations.markdown import generate_markdown_annotation
 from src.dataset.splitter import get_split
 import random
@@ -25,11 +27,13 @@ class Pipeline:
         if not fonts:
             raise FileNotFoundError(f"No fonts available for script {script_name}. Cannot generate image.")
             
-        font_path = fonts[0]
+        font_path = random.choice(fonts)
         
         # 1. Background
-        width = self.config.get("image_size", {}).get("width", 1200)
-        height = self.config.get("image_size", {}).get("height", 1600)
+        image_sizes = self.config.get("image_sizes", [{"width": 1200, "height": 1600}])
+        size = random.choice(image_sizes)
+        width, height = size["width"], size["height"]
+        
         bg_type = random.choice(self.config.get("background", {}).get("types", ["paper"]))
         
         if bg_type == "paper":
@@ -41,21 +45,24 @@ class Pipeline:
         
         # 2. Layout
         margins = self.config.get("margins", {})
+        layout = Layout(width, height, margins)
+        
         x = margins.get("left", 100)
         y = margins.get("top", 100)
         max_w = width - x - margins.get("right", 100)
         max_h = height - y - margins.get("bottom", 100)
         
-        layout = Layout(width, height, margins)
         layout.add_block(text, x, y, max_w, max_h, str(font_path))
-        layout = apply_handwriting_variation(layout, self.config.get("rendering", {}))
+        layout = apply_handwriting_variation(layout, self.config.get("rendering", {}), seed)
         
         # 3. Render
-        img = render_text(img, layout, font_path, script_config)
+        img = render_text(img, layout, font_path, script_config, self.config, seed)
         
         # 4. Effects
-        img = apply_ink_effects(img, self.config.get("effects", {}), seed)
-        img = apply_deformation(img, self.config.get("effects", {}), seed)
+        img = apply_ink_effects(img, self.config.get("effects", {}).get("ink_bleeding", {}), seed)
+        img = apply_stains(img, self.config.get("effects", {}).get("stains", {}), seed)
+        img = apply_noise(img, self.config.get("effects", {}).get("noise", {}), seed)
+        img = apply_deformation(img, self.config.get("effects", {}).get("deformation", {}), seed)
         
         # 5. Save
         filename_base = f"{script_name}_{split}_{image_idx:04d}"
