@@ -1,0 +1,5 @@
+# [DEVELOPMENT/TEST DATA]
+# This is not authentic historical manuscript text.
+यह देवनागरी लिपि का एक परीक्षण वाक्य है।
+यह एक और पंक्ति है।
+विस्तृत पाठ परीक्षण के लिए।

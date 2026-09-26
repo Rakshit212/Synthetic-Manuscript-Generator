@@ -1,0 +1,86 @@
+# Synthetic Manuscript Generator Configuration
+
+# Output Settings
+output_path: "data/output"
+dataset_splits:
+  train: 85
+  validation: 10
+  test: 5
+
+# Image Dimensions (Width x Height)
+image_size:
+  width: 1200
+  height: 1600
+
+# Margins
+margins:
+  top: 100
+  bottom: 100
+  left: 100
+  right: 100
+
+# Script specific settings
+scripts:
+  devanagari:
+    name: "Devanagari"
+    enabled: true
+    input_file: "data/input/devanagari.txt"
+    font_dir: "fonts/devanagari"
+    default_font_size: 40
+    line_spacing: 1.5
+    character_spacing: 0
+    default_ink_color: [30, 20, 20]
+  modi:
+    name: "Modi"
+    enabled: true
+    input_file: "data/input/modi.txt"
+    font_dir: "fonts/modi"
+    default_font_size: 40
+    line_spacing: 1.5
+    character_spacing: 0
+    default_ink_color: [30, 20, 20]
+  sharada:
+    name: "Sharada"
+    enabled: true
+    input_file: "data/input/sharada.txt"
+    font_dir: "fonts/sharada"
+    default_font_size: 40
+    line_spacing: 1.5
+    character_spacing: 0
+    default_ink_color: [30, 20, 20]
+
+# Background generation
+background:
+  types: ["paper", "palm_leaf"]
+  base_colors:
+    paper: [[240, 230, 210], [220, 210, 190], [210, 200, 180]]
+    palm_leaf: [[180, 160, 120], [160, 140, 100]]
+  noise_intensity: 0.1
+  edge_darkening_intensity: 0.3
+
+# Rendering variations (Handwriting effects)
+rendering:
+  rotation_range: [-2.0, 2.0] # degrees
+  slant_range: [-0.05, 0.05]
+  baseline_variation: 5 # pixels
+  char_spacing_variation: 2 # pixels
+  line_spacing_variation: 10 # pixels
+  ink_opacity_range: [0.7, 1.0]
+
+# Effects (Imperfections)
+effects:
+  ink_bleeding:
+    probability: 0.5
+    intensity: 0.3
+  smudging:
+    probability: 0.3
+    intensity: 0.4
+  aging:
+    probability: 0.8
+    intensity: 0.5
+  stains:
+    probability: 0.4
+    max_stains: 3
+  deformation:
+    probability: 0.7
+    intensity: 0.2

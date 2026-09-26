@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv/
+data/output/
+fonts/*/*.ttf
+fonts/*/*.otf
+# Except don't ignore the fonts directory itself
+!fonts/devanagari/.keep
+!fonts/modi/.keep
+!fonts/sharada/.keep
+!data/input/.keep
+!data/output/.keep
+.pytest_cache/
+.coverage
+htmlcov/
