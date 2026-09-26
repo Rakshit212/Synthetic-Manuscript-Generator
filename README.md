@@ -61,4 +61,5 @@ python validate_dataset.py
 ```
 
 ## Hugging Face Dataset
-[To be added after upload]
+The generated dataset is hosted and publicly available on Hugging Face:
+👉 https://huggingface.co/datasets/Rakshit212/Synthetic-Manuscript-Generator
