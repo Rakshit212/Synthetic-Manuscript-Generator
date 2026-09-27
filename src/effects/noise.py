@@ -26,18 +26,19 @@ def apply_noise(image, config, seed=None):
     total_pixels = width * height
     num_specks = int(total_pixels * density)
     
-    # Dark specks (dirt, debris)
-    for _ in range(num_specks):
-        x = random.randint(0, width - 1)
-        y = random.randint(0, height - 1)
-        darkness = random.randint(0, 80)
-        img_np[y, x] = [darkness, darkness, darkness]
-    
-    # Light specks (paper fiber highlights)
-    for _ in range(num_specks // 3):
-        x = random.randint(0, width - 1)
-        y = random.randint(0, height - 1)
-        lightness = random.randint(200, 255)
-        img_np[y, x] = [lightness, lightness, lightness]
+    # Dark specks (dirt, debris) — vectorised
+    if num_specks > 0:
+        xs = np.random.randint(0, width,  num_specks)
+        ys = np.random.randint(0, height, num_specks)
+        darkness = np.random.randint(0, 80, num_specks)
+        img_np[ys, xs] = np.stack([darkness, darkness, darkness], axis=1)
+
+    # Light specks (paper fiber highlights) — vectorised
+    num_light = num_specks // 3
+    if num_light > 0:
+        xs = np.random.randint(0, width,  num_light)
+        ys = np.random.randint(0, height, num_light)
+        lightness = np.random.randint(200, 255, num_light)
+        img_np[ys, xs] = np.stack([lightness, lightness, lightness], axis=1)
     
     return Image.fromarray(np.clip(img_np, 0, 255).astype(np.uint8))

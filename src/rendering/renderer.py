@@ -58,14 +58,14 @@ def render_text(image, layout, font_path, script_config, global_config, seed=Non
         if current_line:
             lines.append(" ".join(current_line))
             
-        try:
-            line_height = font.getbbox("A")[3] - font.getbbox("A")[1]
-            if line_height == 0:
-                line_height = base_font_size
-        except AttributeError:
-            line_height = font.getsize("A")[1]
-            
-        base_line_spacing = int(line_height * script_config.get("line_spacing", 1.5))
+        # Use base_font_size as the canonical line-cell height.
+        # getbbox("A") is unreliable for Indic fonts — it returns only the
+        # Latin cap height and ignores ascenders / vowel marks (matras).
+        # Multiplying the actual font size by the spacing multiplier gives a
+        # stable, script-independent leading value.
+        line_height = base_font_size
+        spacing_multiplier = script_config.get("line_spacing", 1.5)
+        base_line_spacing = int(base_font_size * spacing_multiplier)
         
         y = y_start
         line_idx = 0
@@ -81,7 +81,8 @@ def render_text(image, layout, font_path, script_config, global_config, seed=Non
             rot_range = render_config.get("rotation_range", [-1.0, 1.0])
             angle = random.uniform(rot_range[0], rot_range[1])
             
-            spacing_var = render_config.get("line_spacing_variation", 5)
+            # Cap jitter to ±4 px so random variation never collapses lines.
+            spacing_var = min(render_config.get("line_spacing_variation", 5), 4)
             spacing_jitter = random.randint(-spacing_var, spacing_var)
             
             margin_jitter = random.randint(-8, 8)
@@ -99,16 +100,19 @@ def render_text(image, layout, font_path, script_config, global_config, seed=Non
             line_opacity = random.randint(opacity_range[0], opacity_range[1])
             ink_fill = tuple(primary_color) + (line_opacity,)
             
-            # Measure line dimensions
+            # Measure line dimensions.
+            # lh uses base_font_size so the layer is tall enough for all
+            # Indic diacritics (matras, chandrabindu, etc.) that extend above
+            # and below the nominal glyph bounding box.
             try:
                 bbox = font.getbbox(line)
                 lw = bbox[2] - bbox[0]
-                lh = bbox[3] - bbox[1] + 10
             except AttributeError:
-                lw, lh = font.getsize(line)
-                
-            # Render the whole line onto a transparent layer (preserves conjuncts)
-            pad = 30
+                lw, _ = font.getsize(line)
+            lh = base_font_size  # reliable height for any Indic font
+
+            # Generous vertical padding so top/bottom marks are never clipped.
+            pad = 50
             txt_layer = Image.new("RGBA", (lw + 2 * pad, lh + 2 * pad), (0, 0, 0, 0))
             txt_draw = ImageDraw.Draw(txt_layer)
             
@@ -133,7 +137,8 @@ def render_text(image, layout, font_path, script_config, global_config, seed=Non
                 # Space after word with jitter
                 space_w = font.getbbox(" ")[2] - font.getbbox(" ")[0] if hasattr(font, 'getbbox') else font.getsize(" ")[0]
                 char_sp_var = render_config.get("char_spacing_variation", 2)
-                cx += ww + space_w + random.randint(-char_sp_var, char_sp_var)
+                base_char_sp = script_config.get("character_spacing", 0)
+                cx += ww + space_w + base_char_sp + random.randint(-char_sp_var, char_sp_var)
                 
             # Apply slant (horizontal shear)
             slant_range = render_config.get("slant_range", [-0.04, 0.04])

@@ -34,8 +34,8 @@ scripts:
     input_file: "data/input/devanagari.txt"
     font_dir: "fonts/devanagari"
     default_font_size: 36
-    line_spacing: 1.6
-    character_spacing: 0
+    line_spacing: 1.5
+    character_spacing: 8
     default_ink_color: [30, 20, 20]
     ink_colors:
       - [25, 15, 10]    # dark brown-black
@@ -49,8 +49,8 @@ scripts:
     input_file: "data/input/modi.txt"
     font_dir: "fonts/modi"
     default_font_size: 38
-    line_spacing: 1.7
-    character_spacing: 0
+    line_spacing: 1.5
+    character_spacing: 8
     default_ink_color: [30, 20, 20]
     ink_colors:
       - [25, 15, 10]
@@ -63,8 +63,8 @@ scripts:
     input_file: "data/input/sharada.txt"
     font_dir: "fonts/sharada"
     default_font_size: 38
-    line_spacing: 1.7
-    character_spacing: 0
+    line_spacing: 1.5
+    character_spacing: 8
     default_ink_color: [30, 20, 20]
     ink_colors:
       - [25, 15, 10]

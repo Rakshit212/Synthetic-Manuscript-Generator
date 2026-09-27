@@ -29,14 +29,13 @@ def apply_deformation(image, config, seed=None):
     phase_x = random.uniform(0, 2 * np.pi)
     phase_y = random.uniform(0, 2 * np.pi)
     
-    # Create mesh grid
-    map_x = np.zeros((height, width), dtype=np.float32)
-    map_y = np.zeros((height, width), dtype=np.float32)
-    
-    for y_coord in range(height):
-        for x_coord in range(width):
-            map_x[y_coord, x_coord] = x_coord + amp_x * np.sin(freq_y * y_coord + phase_x)
-            map_y[y_coord, x_coord] = y_coord + amp_y * np.sin(freq_x * x_coord + phase_y)
+    # Create mesh grid — fully vectorised (replaces the slow per-pixel Python loop)
+    x_coords = np.arange(width,  dtype=np.float32)
+    y_coords = np.arange(height, dtype=np.float32)
+    grid_x, grid_y = np.meshgrid(x_coords, y_coords)
+
+    map_x = (grid_x + amp_x * np.sin(freq_y * grid_y + phase_x)).astype(np.float32)
+    map_y = (grid_y + amp_y * np.sin(freq_x * grid_x + phase_y)).astype(np.float32)
     
     # Apply remap
     result = cv2.remap(img_np, map_x, map_y, interpolation=cv2.INTER_LINEAR, 
